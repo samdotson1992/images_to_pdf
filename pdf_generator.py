@@ -4,10 +4,17 @@ import glob
 import argparse
 import os
 import shutil
+import ntpath
+
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
 
 def get_photo_num(image_name):
     try: 
-        return int(image_name.split("_")[-1].split(".")[0])
+        #return int(image_name.split("_")[-1].split(".")[0])
+        print(path_leaf(image_name).split("-")[0])
+        return int(path_leaf(image_name).split("-")[0]) 
     except:
         print("Image number could not be found for - ", image_name)
         pass
@@ -44,6 +51,7 @@ def main(csv_file, photo_dir, output_dir ):
     os.makedirs(output_dir )
 
     df = pd.read_csv(csv_file)
+    print(df.head())
     lookup_dict = df.set_index('Photo #').to_dict()
 
     # Import glob module to find all the files matching a pattern
@@ -66,6 +74,7 @@ def main(csv_file, photo_dir, output_dir ):
     for image in images:
         i+=1
         image_num = get_photo_num(image)
+        print(image_num)
         if image_num in  lookup_dict['Description of Property']:
             desc = lookup_dict['Description of Property'][image_num]
             desc = str(desc).encode('latin-1', 'replace').decode('latin-1')
